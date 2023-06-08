@@ -30,5 +30,6 @@ class DiscordIntegration : JavaPlugin(), CoroutineScope by DiscordMessenger.inst
 
 @Serializable
 data class Config(
-    val webhookUrl: String
+    val webhookUrl: String,
+    val chatChannelId: Long
 )
