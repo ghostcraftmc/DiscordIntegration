@@ -7,6 +7,7 @@ import org.bukkit.NamespacedKey
 import org.bukkit.advancement.Advancement
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
+import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.event.player.AsyncPlayerChatEvent
 import org.bukkit.event.player.PlayerAdvancementDoneEvent
 import org.bukkit.event.player.PlayerJoinEvent
@@ -42,7 +43,13 @@ class EventListener(
     fun PlayerJoinEvent.handlePlayerJoin() {
         val msg = DiscordEmbed.builder()
             .color(Color.green)
-            .author(DiscordEmbed.EmbedAuthor("${player.name} joined the server","https://minotar.net/avatar/${player.name}/100.png",null))
+            .author(
+                DiscordEmbed.EmbedAuthor(
+                    "${player.name} joined the server",
+                    "https://minotar.net/avatar/${player.name}/100.png",
+                    null
+                )
+            )
             .build()
 
 
@@ -54,8 +61,29 @@ class EventListener(
     @EventHandler(ignoreCancelled = true)
     fun PlayerQuitEvent.handlePlayerQuit() {
         val msg = DiscordEmbed.builder()
-            .author(DiscordEmbed.EmbedAuthor("${player.name} left the server","https://minotar.net/avatar/${player.name}/100.png",null))
+            .author(
+                DiscordEmbed.EmbedAuthor(
+                    "${player.name} left the server",
+                    "https://minotar.net/avatar/${player.name}/100.png",
+                    null
+                )
+            )
             .color(Color.red)
+            .build()
+
+        discordIntegration.launch {
+            DiscordMessenger.sendAction(SendMessageAction.of(config.chatChannelId, DiscordMessage.embeds(msg)))
+        }
+
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    fun PlayerDeathEvent.handlePlayerDeath() {
+        val msg = DiscordEmbed.builder()
+            .author(
+                DiscordEmbed.EmbedAuthor("$deathMessage","https://minotar.net/avatar/${entity.name}/100.png",null)
+            )
+            .color(Color.black)
             .build()
 
         discordIntegration.launch {
