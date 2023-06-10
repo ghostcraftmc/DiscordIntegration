@@ -19,7 +19,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly(spigotAll("1.16.5"))
+    compileOnly(spigot("1.16.5"))
     compileOnly(fileTree(mapOf("dir" to "${rootProject.rootDir}/lib", "include" to listOf("*.jar"))))
 
     compileOnly(kotlin("stdlib-jdk8"))

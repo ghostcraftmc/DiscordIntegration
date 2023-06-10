@@ -101,11 +101,14 @@ class EventListener(
         discordIntegration.launch {
             val display = advancement.display ?: return@launch
 
-            val msg = DiscordMessage.builder()
-                .appendContent("${player.name} has made an advancement $display")
-                .build()
+              val msg = DiscordEmbed.builder()
+                  .author(
+                      DiscordEmbed.EmbedAuthor("${player.name} has made an advancement $display","https://minotar.net/avatar/${player.name}/100.png",null)
+                  )
+                  .color(Color.yellow)
+                  .build()
 
-            DiscordMessenger.sendAction(SendMessageAction.of(config.chatChannelId, msg))
+            DiscordMessenger.sendAction(SendMessageAction.of(config.chatChannelId, DiscordMessage.embeds(msg)))
         }
     }
 
