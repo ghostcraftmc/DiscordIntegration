@@ -1,5 +1,6 @@
 package me.abhigya.discordintegration
 
+import com.google.gson.JsonObject
 import kotlinx.coroutines.launch
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer
@@ -122,45 +123,49 @@ val Advancement.display: String?
             isAccessible = true
             get(this@display)
         }
-        val display = handle.javaClass.getDeclaredMethod("c").run {
-            isAccessible = true
-            invoke(handle)
+        val display = handle.javaClass.declaredFields
+            .firstOrNull { it.type.simpleName == "AdvancementDisplay" }
+            ?.also { it.isAccessible = true }
+            ?.get(handle) ?: run {
+                ADVANCEMENT_TITLES[key] = null
+                return null
         }
 
-        val shouldDisplay = runCatching {
-            display.javaClass.getDeclaredMethod("i").invoke(display) as Boolean
-        }.getOrElse { false }
+        val json = display.javaClass.getDeclaredMethod("k").invoke(display) as JsonObject
+
+        val shouldDisplay = json["announce_to_chat"].asBoolean
 
         if (!shouldDisplay) {
             ADVANCEMENT_TITLES[key] = null
             return null
         }
 
-        val title = display.javaClass.getDeclaredField("a").run {
-            isAccessible = true
-            get(display)
-        }
+        val title = json["title"]
 
-        return runCatching {
-            return@runCatching title.javaClass.getDeclaredMethod("getString").run {
-                isAccessible = true
-                invoke(title) as String
-            }
-        }.recoverCatching {
-            return@recoverCatching title.javaClass.getDeclaredMethod("getText").run {
-                isAccessible = true
-                val s = invoke(title) as String
-                s.ifBlank {
-                    val serializer = title.javaClass.declaredClasses.first { it.simpleName == "ChatSerializer" }
-                    val json = serializer.getDeclaredMethod("a", title.javaClass).invoke(null, title) as String
-                    PlainTextComponentSerializer.plainText().serialize(GsonComponentSerializer.gson().deserialize(json))
-                }
-            }
-        }.getOrElse {
-            val key = key.key
-            key.substring(key.lastIndexOf("/") + 1).lowercase().split("_")
-                .joinToString { it.substring(0, 1).uppercase() + it.substring(1) }
-        }.also {
+        return PlainTextComponentSerializer.plainText().serialize(GsonComponentSerializer.gson().deserializeFromTree(title)).also {
             ADVANCEMENT_TITLES[key] = it
         }
+
+//        return runCatching {
+//            return@runCatching title.javaClass.getDeclaredMethod("getString").run {
+//                isAccessible = true
+//                invoke(title) as String
+//            }
+//        }.recoverCatching {
+//            return@recoverCatching title.javaClass.getDeclaredMethod("getText").run {
+//                isAccessible = true
+//                val s = invoke(title) as String
+//                s.ifBlank {
+//                    val serializer = title.javaClass.declaredClasses.first { it.simpleName == "ChatSerializer" }
+//                    val json = serializer.getDeclaredMethod("a", title.javaClass).invoke(null, title) as String
+//                    PlainTextComponentSerializer.plainText().serialize(GsonComponentSerializer.gson().deserialize(json))
+//                }
+//            }
+//        }.getOrElse {
+//            val key = key.key
+//            key.substring(key.lastIndexOf("/") + 1).lowercase().split("_")
+//                .joinToString { it.substring(0, 1).uppercase() + it.substring(1) }
+//        }.also {
+//            ADVANCEMENT_TITLES[key] = it
+//        }
     }
