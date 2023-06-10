@@ -11,8 +11,11 @@ import org.zibble.discordmessenger.DiscordMessenger
 import org.zibble.discordmessenger.components.action.SendMessageAction
 import org.zibble.discordmessenger.components.action.SendWebhookMessageAction
 import org.zibble.discordmessenger.components.action.WebhookUrl
+import org.zibble.discordmessenger.components.readable.DiscordEmbed
+import org.zibble.discordmessenger.components.readable.DiscordEmbedBuilder
 import org.zibble.discordmessenger.components.readable.DiscordMessage
 import org.zibble.discordmessenger.components.readable.WebhookMessage
+import java.awt.Color
 
 class EventListener(
     private val discordIntegration: DiscordIntegration,
@@ -34,24 +37,28 @@ class EventListener(
 
     @EventHandler(ignoreCancelled = true)
     fun PlayerJoinEvent.handlePlayerJoin() {
-        val msg = DiscordMessage.builder()
-            .appendContent("${player.name} joined the server")
+        val msg = DiscordEmbed.builder()
+            .color(Color.green)
+            .author(DiscordEmbed.EmbedAuthor("${player.name} joined the server","https://minotar.net/avatar/${player.name}/100.png",null))
             .build()
 
+
         discordIntegration.launch {
-            DiscordMessenger.sendAction(SendMessageAction.of(config.chatChannelId, msg))
+            DiscordMessenger.sendAction(SendMessageAction.of(config.chatChannelId, DiscordMessage.embeds(msg) ))
         }
     }
 
     @EventHandler(ignoreCancelled = true)
     fun PlayerQuitEvent.handlePlayerQuit() {
-        val msg = DiscordMessage.builder()
-            .appendContent("${player.name} left the server")
+        val msg = DiscordEmbed.builder()
+            .author(DiscordEmbed.EmbedAuthor("${player.name} left the server","https://minotar.net/avatar/${player.name}/100.png",null))
+            .color(Color.red)
             .build()
 
         discordIntegration.launch {
-            DiscordMessenger.sendAction(SendMessageAction.of(config.chatChannelId, msg))
+            DiscordMessenger.sendAction(SendMessageAction.of(config.chatChannelId, DiscordMessage.embeds(msg)))
         }
+
     }
 
     @EventHandler(ignoreCancelled = true)
@@ -65,6 +72,5 @@ class EventListener(
 
         }
     }
-
 
 }
