@@ -4,6 +4,7 @@ plugins {
     kotlin("jvm") version "1.8.21"
     kotlin("plugin.serialization") version "1.8.21"
     id("kr.entree.spigradle") version "1.2.4"
+    id("com.github.johnrengelman.shadow") version "7.1.2"
 }
 
 group = "me.abhigya"
@@ -25,9 +26,20 @@ dependencies {
     compileOnly("org.jetbrains.kotlinx:kotlinx-coroutines-core")
 
     compileOnly("com.charleskorn.kaml:kaml:0.54.0")
+
+    implementation("net.kyori:adventure-text-serializer-gson:4.14.0")
+    implementation("net.kyori:adventure-text-serializer-plain:4.14.0")
 }
 
 tasks {
+    assemble {
+        dependsOn(shadowJar)
+    }
+
+    shadowJar {
+        minimize()
+    }
+
     compileKotlin {
         kotlinOptions.suppressWarnings = true
         kotlinOptions.jvmTarget = javaVersion.toString()
