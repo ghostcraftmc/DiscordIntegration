@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "me.abhigya"
-version = "1.0-SNAPSHOT"
+version = "1.0"
 
 val javaVersion = 1.8
 
@@ -37,11 +37,14 @@ tasks {
     processResources {
         filteringCharset = Charsets.UTF_8.name()
     }
+
 }
 
 spigot {
     name = "DiscordIntegration"
+    main = "me.abhigya.discordintegration.DiscordIntegration"
     version = "1.0"
+    apiVersion = "1.13"
     authors = listOf("Abhigya")
     description = "Minecraft to Discord Integration"
     depends = listOf("KotlinLibrary", "DiscordMessenger2")
