@@ -1,4 +1,5 @@
 import kr.entree.spigradle.kotlin.spigot
+import kr.entree.spigradle.kotlin.spigotAll
 
 plugins {
     kotlin("jvm") version "1.8.21"
@@ -18,7 +19,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly(spigot("1.16.5"))
+    compileOnly(spigotAll("1.16.5"))
     compileOnly(fileTree(mapOf("dir" to "${rootProject.rootDir}/lib", "include" to listOf("*.jar"))))
 
     compileOnly(kotlin("stdlib-jdk8"))

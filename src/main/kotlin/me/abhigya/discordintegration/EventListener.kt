@@ -122,12 +122,16 @@ val Advancement.display: String?
             isAccessible = true
             get(this@display)
         }
-        val display = handle.javaClass.getDeclaredField("display").run {
+        val display = handle.javaClass.getDeclaredMethod("c").run {
             isAccessible = true
-            get(handle)
+            invoke(handle)
         }
 
-        if (!(display.javaClass.getDeclaredMethod("i").invoke(display) as Boolean)) {
+        val shouldDisplay = runCatching {
+            display.javaClass.getDeclaredMethod("i").invoke(display) as Boolean
+        }.getOrElse { false }
+
+        if (!shouldDisplay) {
             ADVANCEMENT_TITLES[key] = null
             return null
         }
