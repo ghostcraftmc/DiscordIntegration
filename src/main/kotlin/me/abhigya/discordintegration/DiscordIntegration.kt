@@ -7,6 +7,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.bukkit.Bukkit
+import org.bukkit.ChatColor
 import org.bukkit.plugin.java.JavaPlugin
 import org.zibble.discordmessenger.DiscordMessenger
 import org.zibble.discordmessenger.components.action.readable.ChannelMessageAction
@@ -87,8 +88,11 @@ class DiscordMessageListener(
         }
 
         val msg = buildString {
+            append(ChatColor.translateAlternateColorCodes('&',"&9[Discord] "))
+            append(ChatColor.WHITE)
             append(user.name)
-            append(" >> ")
+            append(": ")
+            append(ChatColor.GRAY)
             append(message.content)
         }
 
