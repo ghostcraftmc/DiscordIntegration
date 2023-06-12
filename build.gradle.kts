@@ -1,5 +1,4 @@
 import kr.entree.spigradle.kotlin.spigot
-import kr.entree.spigradle.kotlin.spigotAll
 
 plugins {
     kotlin("jvm") version "1.8.21"
@@ -19,7 +18,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly(spigotAll("1.16.5"))
+    compileOnly(spigot("1.16.5"))
     compileOnly(fileTree(mapOf("dir" to "${rootProject.rootDir}/lib", "include" to listOf("*.jar"))))
 
     compileOnly(kotlin("stdlib-jdk8"))
@@ -38,6 +37,7 @@ tasks {
     }
 
     shadowJar {
+        archiveFileName.set("${project.name}-${project.version}.jar")
         minimize()
     }
 
@@ -49,6 +49,10 @@ tasks {
 
     processResources {
         filteringCharset = Charsets.UTF_8.name()
+    }
+
+    jar {
+        enabled = false
     }
 
 }

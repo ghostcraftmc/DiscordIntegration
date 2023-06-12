@@ -14,9 +14,8 @@ import org.bukkit.event.player.PlayerAdvancementDoneEvent
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import org.zibble.discordmessenger.DiscordMessenger
-import org.zibble.discordmessenger.components.action.SendMessageAction
-import org.zibble.discordmessenger.components.action.SendWebhookMessageAction
-import org.zibble.discordmessenger.components.action.WebhookUrl
+import org.zibble.discordmessenger.components.action.sendable.SendMessageAction
+import org.zibble.discordmessenger.components.action.sendable.SendWebhookMessageAction
 import org.zibble.discordmessenger.components.readable.DiscordEmbed
 import org.zibble.discordmessenger.components.readable.DiscordMessage
 import org.zibble.discordmessenger.components.readable.WebhookMessage
@@ -36,7 +35,7 @@ class EventListener(
             .build()
 
         discordIntegration.launch {
-            DiscordMessenger.sendAction(SendWebhookMessageAction.of(WebhookUrl.of(config.webhookUrl), msg))
+            DiscordMessenger.sendAction(SendWebhookMessageAction.of(config.webhookId, msg))
         }
     }
 
@@ -145,27 +144,4 @@ val Advancement.display: String?
         return PlainTextComponentSerializer.plainText().serialize(GsonComponentSerializer.gson().deserializeFromTree(title)).also {
             ADVANCEMENT_TITLES[key] = it
         }
-
-//        return runCatching {
-//            return@runCatching title.javaClass.getDeclaredMethod("getString").run {
-//                isAccessible = true
-//                invoke(title) as String
-//            }
-//        }.recoverCatching {
-//            return@recoverCatching title.javaClass.getDeclaredMethod("getText").run {
-//                isAccessible = true
-//                val s = invoke(title) as String
-//                s.ifBlank {
-//                    val serializer = title.javaClass.declaredClasses.first { it.simpleName == "ChatSerializer" }
-//                    val json = serializer.getDeclaredMethod("a", title.javaClass).invoke(null, title) as String
-//                    PlainTextComponentSerializer.plainText().serialize(GsonComponentSerializer.gson().deserialize(json))
-//                }
-//            }
-//        }.getOrElse {
-//            val key = key.key
-//            key.substring(key.lastIndexOf("/") + 1).lowercase().split("_")
-//                .joinToString { it.substring(0, 1).uppercase() + it.substring(1) }
-//        }.also {
-//            ADVANCEMENT_TITLES[key] = it
-//        }
     }

@@ -6,11 +6,13 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import org.bukkit.Bukkit
 import org.bukkit.plugin.java.JavaPlugin
 import org.zibble.discordmessenger.DiscordMessenger
-import org.zibble.discordmessenger.components.action.RegisterWebhookClientAction
-import org.zibble.discordmessenger.components.action.SendMessageAction
-import org.zibble.discordmessenger.components.action.WebhookUrl
+import org.zibble.discordmessenger.components.action.readable.ChannelMessageAction
+import org.zibble.discordmessenger.components.action.readable.DiscordMessageListener
+import org.zibble.discordmessenger.components.action.sendable.SendMessageAction
+import org.zibble.discordmessenger.components.entity.User
 import org.zibble.discordmessenger.components.readable.DiscordMessage
 import java.io.File
 import java.io.FileInputStream
@@ -35,7 +37,6 @@ class DiscordIntegration : JavaPlugin(), CoroutineScope by DiscordMessenger.inst
         server.pluginManager.registerEvents(EventListener(this, config), this)
 
         runBlocking {
-            DiscordMessenger.sendAction(RegisterWebhookClientAction.of(WebhookUrl.of(config.webhookUrl)))
             DiscordMessenger.sendAction(SendMessageAction.of(
                 config.chatChannelId,
                 DiscordMessage.builder()
@@ -43,6 +44,8 @@ class DiscordIntegration : JavaPlugin(), CoroutineScope by DiscordMessenger.inst
                     .build()
             ))
         }
+
+        ChannelMessageAction.registerListener(DiscordMessageListener(config.chatChannelId))
     }
 
     override fun onDisable() {
@@ -59,6 +62,37 @@ class DiscordIntegration : JavaPlugin(), CoroutineScope by DiscordMessenger.inst
 
 @Serializable
 data class Config(
-    @SerialName("webhook-url") val webhookUrl: String,
+    @SerialName("webhook-id") val webhookId: Int,
     @SerialName("chat-channel-id") val chatChannelId: Long
 )
+
+class DiscordMessageListener(
+    private val channelId: Long
+) : DiscordMessageListener {
+
+    override suspend fun onDiscordMessage(channelId: Long, user: User, message: DiscordMessage) {
+        if (channelId != this.channelId) return
+        if (user.bot) return
+
+        if (message.content.equals("list", true) || message.content.equals("playerlist", true)) {
+            DiscordMessenger.sendAction(SendMessageAction.of(
+                channelId,
+                DiscordMessage.builder()
+                    .appendContent("```\n")
+                    .appendContent(Bukkit.getOnlinePlayers().joinToString { it.name })
+                    .appendContent("\n```")
+                    .build()
+            ))
+            return
+        }
+
+        val msg = buildString {
+            append(user.name)
+            append(" >> ")
+            append(message.content)
+        }
+
+        Bukkit.broadcastMessage(msg)
+    }
+
+}
