@@ -6,8 +6,11 @@ import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer
 import org.bukkit.NamespacedKey
 import org.bukkit.advancement.Advancement
+import org.bukkit.attribute.Attribute
+import org.bukkit.entity.EnderDragon
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
+import org.bukkit.event.entity.EntitySpawnEvent
 import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.event.player.AsyncPlayerChatEvent
 import org.bukkit.event.player.PlayerAdvancementDoneEvent
@@ -108,6 +111,28 @@ class EventListener(
                   .build()
 
             DiscordMessenger.sendAction(SendMessageAction.of(config.chatChannelId, DiscordMessage.embeds(msg)))
+        }
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    fun EntitySpawnEvent.handleDragonSpawnEvent() {
+        if (entity is EnderDragon) {
+            val dragon = (entity as EnderDragon)
+            if ((dragon.getAttribute(Attribute.GENERIC_MAX_HEALTH)?.value ?: 0.0) > 200) {
+                val msg = DiscordEmbed.builder()
+                    .author(
+                        DiscordEmbed.EmbedAuthor(
+                            "${dragon.customName} has been spawned!",
+                            "https://minecraft-heads.com/media/k2/items/cache/88d5d45f247edf491f9cef0808e71f90_XS.jpg",
+                            null
+                        )
+                    )
+                    .color(Color.yellow)
+                    .build()
+                discordIntegration.launch {
+                    DiscordMessenger.sendAction(SendMessageAction.of(config.chatChannelId, DiscordMessage.embeds(msg)))
+                }
+            }
         }
     }
 
