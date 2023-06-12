@@ -34,7 +34,7 @@ class EventListener(
     @EventHandler(ignoreCancelled = true)
     fun AsyncPlayerChatEvent.handlePlayerChat() {
         val msg = WebhookMessage.builder()
-            .username(player.displayName)
+            .username(player.name)
             .avatarUrl("https://minotar.net/avatar/${player.name}/100.png")
             .content(message)
             .build()
@@ -105,12 +105,12 @@ class EventListener(
         discordIntegration.launch {
             val display = advancement.display ?: return@launch
 
-              val msg = DiscordEmbed.builder()
-                  .author(
-                      DiscordEmbed.EmbedAuthor("${player.name} has made an advancement $display","https://minotar.net/avatar/${player.name}/100.png",null)
-                  )
-                  .color(Color.yellow)
-                  .build()
+            val msg = DiscordEmbed.builder()
+                .author(
+                    DiscordEmbed.EmbedAuthor("${player.name} has made an advancement $display","https://minotar.net/avatar/${player.name}/100.png",null)
+                )
+                .color(Color.yellow)
+                .build()
 
             DiscordMessenger.sendAction(SendMessageAction.of(config.chatChannelId, DiscordMessage.embeds(msg)))
         }
@@ -141,7 +141,7 @@ class EventListener(
     @EventHandler(ignoreCancelled = true)
     fun EntityDeathEvent.handleDragonDeathEvent() {
         if (entity is EnderDragon) {
-            val dragon = (entity as EnderDragon)
+            val dragon = entity as EnderDragon
             if ((dragon.getAttribute(Attribute.GENERIC_MAX_HEALTH)?.value ?: 0.0) > 200) {
                 val msg = DiscordEmbed.builder()
                     .author(

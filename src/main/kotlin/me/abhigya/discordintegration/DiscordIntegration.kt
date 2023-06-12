@@ -76,11 +76,13 @@ class DiscordMessageListener(
         if (user.bot) return
 
         if (message.content.equals("list", true) || message.content.equals("playerlist", true)) {
+            val players = Bukkit.getOnlinePlayers()
             DiscordMessenger.sendAction(SendMessageAction.of(
                 channelId,
                 DiscordMessage.builder()
+                    .appendContent("**Online Players ${players.size}/${Bukkit.getMaxPlayers()}**\n")
                     .appendContent("```\n")
-                    .appendContent(Bukkit.getOnlinePlayers().joinToString { it.name })
+                    .appendContent(players.joinToString { it.name })
                     .appendContent("\n```")
                     .build()
             ))
